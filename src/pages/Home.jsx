@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import MovieGrid from "../components/MovieGrid";
 import SearchBar from "../components/SearchBar";
+import MovieGrid from "../components/MovieGrid";
 import {
   getPopularMovies,
   searchMovies,
@@ -12,127 +12,125 @@ import {
 
 function Home() {
   const [movies, setMovies] = useState([]);
-  const [favorites, setFavorites] = useState(
-    getFavorites()
-  );
-
-  const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1);
-
+  const [favorites, setFavorites] = useState(getFavorites());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
+  const [query, setQuery] = useState("");
   const [hasMore, setHasMore] = useState(true);
 
+  const loadingRef = useRef(false);
+  const pageRef = useRef(1);
   const observerRef = useRef(null);
 
+  // LOAD MOVIES
   const loadMovies = useCallback(
     async (pageNumber, searchQuery = "") => {
-      try {
-        setLoading(true);
-        setError("");
+      // Prevent multiple API requests at the same time
+      if (loadingRef.current) return;
 
+      loadingRef.current = true;
+      setLoading(true);
+      setError("");
+
+      try {
         const data = searchQuery
           ? await searchMovies(searchQuery, pageNumber)
           : await getPopularMovies(pageNumber);
 
+        const newMovies = data.results || [];
+
         setMovies((previousMovies) => {
+          // First page = replace old movies
           if (pageNumber === 1) {
-            return data.results;
+            return newMovies;
           }
 
+          // Remove duplicate movies
           const existingIds = new Set(
             previousMovies.map((movie) => movie.id)
           );
 
-          const newMovies = data.results.filter(
+          const uniqueMovies = newMovies.filter(
             (movie) => !existingIds.has(movie.id)
           );
 
-          return [...previousMovies, ...newMovies];
+          return [...previousMovies, ...uniqueMovies];
         });
 
         setHasMore(pageNumber < data.total_pages);
-      } catch (error) {
-        console.error(error);
-        setError("Unable to load movies.");
+        pageRef.current = pageNumber;
+      } catch (err) {
+        console.error("Movie loading error:", err);
+        setError(err.message || "Unable to load movies.");
       } finally {
+        loadingRef.current = false;
         setLoading(false);
       }
     },
     []
   );
 
+  // FIRST LOAD
   useEffect(() => {
     loadMovies(1);
   }, [loadMovies]);
 
+  // INFINITE SCROLL
   const lastMovieRef = useCallback(
     (node) => {
-      if (loading) return;
-
       if (observerRef.current) {
         observerRef.current.disconnect();
       }
+
+      if (!node) return;
 
       observerRef.current = new IntersectionObserver(
         (entries) => {
           if (
             entries[0].isIntersecting &&
-            hasMore &&
-            !loading
+            !loadingRef.current &&
+            hasMore
           ) {
-            setPage((previousPage) => {
-              const nextPage = previousPage + 1;
+            const nextPage = pageRef.current + 1;
 
-              loadMovies(nextPage, query);
-
-              return nextPage;
-            });
+            loadMovies(nextPage, query);
           }
         },
         {
-          rootMargin: "300px",
+          rootMargin: "200px",
         }
       );
 
-      if (node) {
-        observerRef.current.observe(node);
-      }
+      observerRef.current.observe(node);
     },
-    [loading, hasMore, query, loadMovies]
+    [hasMore, query, loadMovies]
   );
 
+  // SEARCH
   function handleSearch(searchQuery) {
     setQuery(searchQuery);
-    setPage(1);
+    setMovies([]);
     setHasMore(true);
+    pageRef.current = 1;
 
     loadMovies(1, searchQuery);
   }
 
+  // FAVORITES
   function handleToggleFavorite(movie) {
-    const updatedFavorites =
-      toggleFavorite(movie);
-
+    const updatedFavorites = toggleFavorite(movie);
     setFavorites(updatedFavorites);
   }
 
   return (
     <main>
       <section className="hero">
-        <p className="eyebrow">
-          YOUR MOVIE DISCOVERY PLATFORM
-        </p>
+        <p className="eyebrow">CINE-STREAM</p>
 
-        <h1>
-          Discover your next
-          <span> favorite movie.</span>
-        </h1>
+        <h1>Discover Your Next Movie</h1>
 
-        <p className="hero-description">
-          Explore popular movies, search thousands of
-          titles and create your personal watchlist.
+        <p>
+          Search popular movies and save your favorites.
         </p>
 
         <SearchBar onSearch={handleSearch} />
@@ -150,22 +148,24 @@ function Home() {
         onToggleFavorite={handleToggleFavorite}
       />
 
-      {loading && (
-        <div className="loading">
-          Loading movies...
-        </div>
-      )}
+      {/* Infinite scroll trigger */}
+      <div
+        ref={lastMovieRef}
+        style={{
+          height: "40px",
+          marginTop: "20px",
+        }}
+      />
 
-      {!loading && hasMore && (
-        <div
-          ref={lastMovieRef}
-          className="scroll-trigger"
-        />
+      {loading && (
+        <p className="loading-message">
+          Loading movies...
+        </p>
       )}
 
       {!hasMore && movies.length > 0 && (
-        <p className="end-message">
-          You've reached the end of the results.
+        <p className="loading-message">
+          No more movies to load.
         </p>
       )}
     </main>
