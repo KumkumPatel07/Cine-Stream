@@ -1,13 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-function SearchBar({ onSearch, initialValue = "" }) {
-  const [query, setQuery] = useState(initialValue);
+function SearchBar({ onSearch }) {
+  const [query, setQuery] = useState("");
+  const lastSearchRef = useRef("");
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const cleanQuery = query.trim();
+    const cleanQuery = query.trim();
 
-      if (cleanQuery) {
+    if (!cleanQuery) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      if (cleanQuery !== lastSearchRef.current) {
+        lastSearchRef.current = cleanQuery;
         onSearch(cleanQuery);
       }
     }, 500);
@@ -22,7 +28,12 @@ function SearchBar({ onSearch, initialValue = "" }) {
 
     const cleanQuery = query.trim();
 
-    if (cleanQuery) {
+    if (!cleanQuery) {
+      return;
+    }
+
+    if (cleanQuery !== lastSearchRef.current) {
+      lastSearchRef.current = cleanQuery;
       onSearch(cleanQuery);
     }
   }

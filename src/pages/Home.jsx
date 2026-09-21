@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import SearchBar from "../components/SearchBar";
 import MovieGrid from "../components/MovieGrid";
+import MoodMatcher from "../components/MoodMatcher";
 import {
   getPopularMovies,
   searchMovies,
@@ -9,6 +10,17 @@ import {
   getFavorites,
   toggleFavorite,
 } from "../utils/favorites";
+
+function handleMoodMovie(movieTitle) {
+  console.log("AI suggested:", movieTitle);
+
+  setQuery(movieTitle);
+  setMovies([]);
+  setHasMore(false);
+  pageRef.current = 1;
+
+  loadMovies(1, movieTitle);
+}
 
 function Home() {
   const [movies, setMovies] = useState([]);
@@ -59,9 +71,9 @@ function Home() {
 
         setHasMore(pageNumber < data.total_pages);
         pageRef.current = pageNumber;
-      } catch (err) {
+      } catch (error) {
         console.error("Movie loading error:", err);
-        setError(err.message || "Unable to load movies.");
+        setError(error.message || "Unable to load movies.");
       } finally {
         loadingRef.current = false;
         setLoading(false);
@@ -134,6 +146,9 @@ function Home() {
         </p>
 
         <SearchBar onSearch={handleSearch} />
+
+        <MoodMatcher onMovieFound={handleMoodMovie} />
+
       </section>
 
       {error && (

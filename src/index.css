@@ -315,3 +315,299 @@ main {
     padding: 10px;
   }
 }
+
+/* =========================
+   AI MOOD MATCHER
+========================= */
+
+.mood-matcher {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 390px;
+  margin: 55px 0;
+  padding: 55px 65px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 28px;
+  background:
+    radial-gradient(
+      circle at 80% 50%,
+      rgba(130, 75, 255, 0.22),
+      transparent 35%
+    ),
+    linear-gradient(
+      135deg,
+      #171324 0%,
+      #0f0d16 55%,
+      #151020 100%
+    );
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.3);
+}
+
+.mood-content {
+  position: relative;
+  z-index: 2;
+  max-width: 700px;
+}
+
+.mood-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 18px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #c6a8ff;
+  font-size: 24px;
+}
+
+.mood-label {
+  margin: 0 0 12px;
+  color: #b695ff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+}
+
+.mood-content h2 {
+  margin: 0;
+  font-size: clamp(32px, 4vw, 52px);
+  line-height: 1.08;
+  letter-spacing: -1.5px;
+  color: #ffffff;
+}
+
+.mood-content h2 span {
+  color: #a979ff;
+}
+
+.mood-description {
+  max-width: 570px;
+  margin: 20px 0 28px;
+  color: #aaa5b8;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.mood-form {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  max-width: 650px;
+}
+
+.mood-form input {
+  flex: 1;
+  min-width: 0;
+  height: 54px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  outline: none;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+  font-size: 14px;
+  transition: 0.2s ease;
+}
+
+.mood-form input::placeholder {
+  color: #777180;
+}
+
+.mood-form input:focus {
+  border-color: rgba(169, 121, 255, 0.7);
+  background: rgba(255, 255, 255, 0.09);
+  box-shadow: 0 0 0 4px rgba(169, 121, 255, 0.08);
+}
+
+.mood-form button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 54px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 14px;
+  background: #8f5cf7;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.mood-form button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: #9d70ff;
+}
+
+.mood-form button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.mood-form button span {
+  font-size: 19px;
+}
+
+.mood-spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: moodSpin 0.7s linear infinite;
+}
+
+@keyframes moodSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.mood-suggestions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 17px;
+}
+
+.mood-suggestions > span {
+  margin-right: 3px;
+  color: #777180;
+  font-size: 12px;
+}
+
+.mood-suggestions button {
+  padding: 7px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #aaa5b8;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.mood-suggestions button:hover {
+  border-color: rgba(169, 121, 255, 0.5);
+  background: rgba(169, 121, 255, 0.1);
+  color: #ffffff;
+}
+
+.mood-error {
+  margin: 12px 0 0;
+  color: #ff8585;
+  font-size: 13px;
+}
+
+/* Decorative visual */
+
+.mood-decoration {
+  position: absolute;
+  right: 35px;
+  top: 50%;
+  width: 330px;
+  height: 330px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.mood-glow {
+  position: absolute;
+  inset: 55px;
+  border-radius: 50%;
+  background: rgba(143, 92, 247, 0.2);
+  filter: blur(35px);
+}
+
+.mood-orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border: 1px solid rgba(180, 145, 255, 0.16);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.orbit-one {
+  width: 150px;
+  height: 150px;
+}
+
+.orbit-two {
+  width: 230px;
+  height: 230px;
+}
+
+.orbit-three {
+  width: 310px;
+  height: 310px;
+}
+
+.mood-movie-symbol {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90px;
+  height: 90px;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 25px;
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(15px);
+}
+
+.mood-movie-symbol span {
+  color: #c5a7ff;
+  font-size: 30px;
+  margin-left: 4px;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .mood-matcher {
+    padding: 45px 35px;
+  }
+
+  .mood-decoration {
+    right: -80px;
+    opacity: 0.5;
+  }
+}
+
+@media (max-width: 650px) {
+  .mood-matcher {
+    min-height: auto;
+    padding: 35px 22px;
+    border-radius: 22px;
+  }
+
+  .mood-form {
+    flex-direction: column;
+  }
+
+  .mood-form button {
+    width: 100%;
+  }
+
+  .mood-decoration {
+    display: none;
+  }
+
+  .mood-content h2 {
+    font-size: 34px;
+  }
+}

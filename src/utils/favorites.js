@@ -9,7 +9,11 @@ export function getFavorites() {
       ? JSON.parse(storedFavorites)
       : [];
   } catch (error) {
-    console.error("Failed to read favorites", error);
+    console.error(
+      "Failed to read favorites:",
+      error
+    );
+
     return [];
   }
 }
@@ -28,18 +32,11 @@ export function toggleFavorite(movie) {
     (favorite) => favorite.id === movie.id
   );
 
-  let updatedFavorites;
-
-  if (alreadyFavorite) {
-    updatedFavorites = favorites.filter(
-      (favorite) => favorite.id !== movie.id
-    );
-  } else {
-    updatedFavorites = [
-      ...favorites,
-      movie,
-    ];
-  }
+  const updatedFavorites = alreadyFavorite
+    ? favorites.filter(
+        (favorite) => favorite.id !== movie.id
+      )
+    : [...favorites, movie];
 
   saveFavorites(updatedFavorites);
 

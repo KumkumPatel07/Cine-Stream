@@ -6,12 +6,12 @@ import {
 } from "../utils/favorites";
 
 function Favorites() {
-  const [favorites, setFavorites] = useState(
-    getFavorites()
-  );
+  const [favorites, setFavorites] =
+    useState(getFavorites());
 
   function handleToggleFavorite(movie) {
-    const updatedFavorites = toggleFavorite(movie);
+    const updatedFavorites =
+      toggleFavorite(movie);
 
     setFavorites(updatedFavorites);
   }
