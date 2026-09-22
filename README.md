@@ -1,16 +1,49 @@
-# React + Vite
+# 🎬 Cine-Stream
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Cine-Stream is a Netflix-style movie discovery web application built with React and Vite. It allows users to discover popular movies, search for movies, continuously browse results, save favorites, and get AI-powered movie recommendations based on their mood.
 
-Currently, two official plugins are available:
+## 🚀 Live Demo
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+🔗 Live Demo: [live url](https://cine-stream-two-alpha.vercel.app/)
 
-## React Compiler
+## 📂 GitHub Repository
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+🔗 GitHub: https://github.com/KumkumPatel07/Cine-Stream
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## ✨ Features
+
+### 🎥 Movie Discovery
+
+- Fetches popular movies from TMDB.
+- Displays movie posters, titles, release years, and ratings.
+- Responsive movie grid layout.
+- Handles movies without available posters.
+
+### 🔎 Movie Search
+
+- Search movies using the TMDB API.
+- Search requests use a 500ms debounce to avoid unnecessary API calls.
+- Search results are dynamically displayed.
+
+### ♾️ Infinite Scroll
+
+- Uses the IntersectionObserver API.
+- Automatically loads the next page when the user reaches the bottom.
+- Prevents duplicate movies from being added.
+- Continues loading until all available TMDB pages are reached.
+
+### ❤️ Favorites
+
+- Add or remove movies using the favorite button.
+- Favorites are stored in browser localStorage.
+- Favorites remain available after refreshing the page.
+- Dedicated `/favorites` route for saved movies.
+
+### 🖼️ Lazy Loading
+
+Movie posters use native browser lazy loading:
+
+```html
+loading="lazy"
