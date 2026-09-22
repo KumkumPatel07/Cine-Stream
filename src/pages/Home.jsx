@@ -12,16 +12,7 @@ import {
   toggleFavorite,
 } from "../utils/favorites";
 
-function handleMoodMovie(movieTitle) {
-  console.log("AI suggested:", movieTitle);
 
-  setQuery(movieTitle);
-  setMovies([]);
-  setHasMore(false);
-  pageRef.current = 1;
-
-  loadMovies(1, movieTitle);
-}
 
 function Home() {
   const [movies, setMovies] = useState([]);
@@ -34,6 +25,17 @@ function Home() {
   const loadingRef = useRef(false);
   const pageRef = useRef(1);
   const observerRef = useRef(null);
+
+  function handleMoodMovie(movieTitle) {
+  console.log("AI suggested:", movieTitle);
+
+  setQuery(movieTitle);
+  setMovies([]);
+  setHasMore(true);
+  pageRef.current = 1;
+
+  loadMovies(1, movieTitle);
+}
 
   // LOAD MOVIES
   const loadMovies = useCallback(

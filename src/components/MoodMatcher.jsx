@@ -23,10 +23,13 @@ function MoodMatcher({ onMovieFound }) {
       console.log("AI movie:", movieTitle);
 
       onMovieFound(movieTitle);
-    } catch (error) {
-      console.error("Mood matcher error:", error);
-      setError(error.message || "Something went wrong.");
-    } finally {
+      } catch (error) {
+  console.error("MOOD MATCHER ERROR:", error);
+
+  setError(
+    error?.message || "Something went wrong with Gemini API."
+  );
+}finally {
       setLoading(false);
     }
   }

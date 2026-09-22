@@ -6,25 +6,18 @@ export async function getMoodMovie(mood) {
   }
 
   const prompt = `
-You are a movie recommendation assistant.
+Recommend ONE popular movie for this mood: "${mood}"
 
-The user is feeling: "${mood}"
-
-Recommend ONE popular movie that matches this mood.
-
-Return ONLY valid JSON in this exact format:
-
+Return ONLY JSON:
 {
   "movieTitle": "Movie Name"
 }
-
-Do not add markdown.
-Do not add explanations.
-Do not add any extra text.
 `;
 
+  const model = "gemini-3.6-flash";
+
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
     {
       method: "POST",
       headers: {
@@ -33,11 +26,7 @@ Do not add any extra text.
       body: JSON.stringify({
         contents: [
           {
-            parts: [
-              {
-                text: prompt,
-              },
-            ],
+            parts: [{ text: prompt }],
           },
         ],
       }),
@@ -46,11 +35,13 @@ Do not add any extra text.
 
   const data = await response.json();
 
-  console.log("Gemini response:", data);
+  console.log("STATUS:", response.status);
+  console.log("GEMINI RESPONSE:", data);
 
   if (!response.ok) {
     throw new Error(
-      data?.error?.message || "Gemini API request failed."
+      data?.error?.message ||
+        `Gemini API Error: ${response.status}`
     );
   }
 
@@ -62,23 +53,19 @@ Do not add any extra text.
   }
 
   const cleanText = text
-    .replace(/```json/g, "")
+    .replace(/```json/gi, "")
     .replace(/```/g, "")
     .trim();
 
-  let result;
-
   try {
-    result = JSON.parse(cleanText);
+    const result = JSON.parse(cleanText);
+
+    if (!result.movieTitle) {
+      throw new Error("Movie title missing from Gemini response.");
+    }
+
+    return result.movieTitle;
   } catch {
-    throw new Error(
-      `Gemini returned invalid JSON: ${cleanText}`
-    );
+    throw new Error(`Invalid Gemini response: ${cleanText}`);
   }
-
-  if (!result.movieTitle) {
-    throw new Error("Gemini did not return a movie title.");
-  }
-
-  return result.movieTitle;
 }
