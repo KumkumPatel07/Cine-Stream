@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getMoodMovie } from "../services/ai";
 
 function MoodMatcher({ onMovieFound }) {
   const [mood, setMood] = useState("");
@@ -6,71 +7,29 @@ function MoodMatcher({ onMovieFound }) {
   const [error, setError] = useState("");
 
   async function handleMoodSearch(event) {
-  event.preventDefault();
+    event.preventDefault();
 
-  if (!mood.trim()) {
-    setError("Tell us your mood first.");
-    return;
-  }
-
-  setLoading(true);
-  setError("");
-
-  try {
-    const response = await fetch("/api/mood", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        mood: mood.trim(),
-      }),
-    });
-
-    // Pehle text read karo
-    const responseText = await response.text();
-
-    console.log("Mood API status:", response.status);
-    console.log("Mood API response:", responseText);
-
-    // Empty response check
-    if (!responseText.trim()) {
-      throw new Error(
-        `Mood API returned an empty response. Status: ${response.status}`
-      );
+    if (!mood.trim()) {
+      setError("Tell us your mood first.");
+      return;
     }
 
-    // JSON parse
-    let data;
+    setLoading(true);
+    setError("");
 
     try {
-      data = JSON.parse(responseText);
-    } catch {
-      throw new Error(
-        `Mood API returned invalid JSON: ${responseText}`
-      );
+      const movieTitle = await getMoodMovie(mood.trim());
+
+      console.log("AI movie:", movieTitle);
+
+      onMovieFound(movieTitle);
+    } catch (error) {
+      console.error("Mood matcher error:", error);
+      setError(error.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
     }
-
-    if (!response.ok) {
-      throw new Error(
-        data.error || "Mood API request failed"
-      );
-    }
-
-    if (!data.movieTitle) {
-      throw new Error("AI did not return a movie title.");
-    }
-
-    console.log("AI movie:", data.movieTitle);
-
-    onMovieFound(data.movieTitle);
-  } catch (error) {
-    console.error("Mood matcher error:", error);
-    setError(error.message || "Something went wrong.");
-  } finally {
-    setLoading(false);
   }
-}
 
   return (
     <section className="mood-matcher">
@@ -91,10 +50,7 @@ function MoodMatcher({ onMovieFound }) {
           your vibe.
         </p>
 
-        <form
-          className="mood-form"
-          onSubmit={handleMoodSearch}
-        >
+        <form className="mood-form" onSubmit={handleMoodSearch}>
           <input
             type="text"
             value={mood}
@@ -118,11 +74,7 @@ function MoodMatcher({ onMovieFound }) {
           </button>
         </form>
 
-        {error && (
-          <p className="mood-error">
-            {error}
-          </p>
-        )}
+        {error && <p className="mood-error">{error}</p>}
 
         <div className="mood-suggestions">
           <span>Try:</span>

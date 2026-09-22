@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import SearchBar from "../components/SearchBar";
 import MovieGrid from "../components/MovieGrid";
 import MoodMatcher from "../components/MoodMatcher";
+
 import {
   getPopularMovies,
   searchMovies,
