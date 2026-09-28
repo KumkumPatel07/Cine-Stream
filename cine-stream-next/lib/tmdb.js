@@ -2,9 +2,9 @@ import { Agent, setGlobalDispatcher } from "undici";
 import { cache } from "react";
 
 const API_KEY = process.env.TMDB_API_KEY;
-
 const BASE_URL = "https://api.themoviedb.org/3";
 
+// Force IPv4 for TMDB connection
 setGlobalDispatcher(
   new Agent({
     connect: {
@@ -58,3 +58,28 @@ export const getMovie = cache(async function getMovie(id) {
 
   return response.json();
 });
+
+export async function searchMovies(query) {
+  if (!API_KEY) {
+    throw new Error("TMDB_API_KEY is missing");
+  }
+
+  const response = await fetch(
+    `${BASE_URL}/search/movie?api_key=${API_KEY}&language=en-US&query=${encodeURIComponent(
+      query
+    )}&page=1`,
+    {
+      next: {
+        revalidate: 300,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `TMDB search failed: ${response.status} ${response.statusText}`
+    );
+  }
+
+  return response.json();
+}

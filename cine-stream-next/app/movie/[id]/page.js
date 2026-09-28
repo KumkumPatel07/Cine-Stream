@@ -1,4 +1,6 @@
+﻿import Image from "next/image";
 import { getMovie } from "../../../lib/tmdb";
+import FavoriteButton from "../../../components/FavoriteButton";
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
@@ -19,18 +21,49 @@ export default async function MovieDetails({ params }) {
 
   return (
     <main className="movie-details">
-      <h1>{movie.title}</h1>
+      <div className="movie-details-container">
 
-      {movie.tagline && (
-        <p className="tagline">{movie.tagline}</p>
-      )}
+        {movie.poster_path && (
+          <Image
+            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+            alt={movie.title}
+            width={500}
+            height={750}
+            className="details-poster"
+          />
+        )}
 
-      <p>{movie.overview}</p>
+        <div className="movie-details-content">
 
-      <div className="movie-meta">
-        <p>⭐ Rating: {movie.vote_average?.toFixed(1)}</p>
-        <p>📅 Release Date: {movie.release_date}</p>
-        <p>🎬 Runtime: {movie.runtime} minutes</p>
+          <h1>{movie.title}</h1>
+
+          {movie.tagline && (
+            <p className="tagline">
+              {movie.tagline}
+            </p>
+          )}
+
+          <p className="overview">
+            {movie.overview}
+          </p>
+
+          <div className="movie-meta">
+            <p>
+              Rating: {movie.vote_average?.toFixed(1)}
+            </p>
+
+            <p>
+              Release Date: {movie.release_date}
+            </p>
+
+            <p>
+              Runtime: {movie.runtime} minutes
+            </p>
+          </div>
+
+          <FavoriteButton movie={movie} />
+
+        </div>
       </div>
     </main>
   );
