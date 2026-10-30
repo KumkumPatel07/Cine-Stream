@@ -15,6 +15,7 @@ export default function ChatPage() {
 
   const [connected, setConnected] = useState(false);
   const [joined, setJoined] = useState(false);
+  const [room, setRoom] = useState("General");
   const [typingUser, setTypingUser] = useState("");
 
   useEffect(() => {
@@ -31,19 +32,22 @@ export default function ChatPage() {
     const name = usernameInput.trim();
 
     if (!name) return;
-setUsername(name);
-setJoined(true);
 
-const socket = io(
-  process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000"
-);
+    setUsername(name);
+    setJoined(true);
+
+    const socket = io(
+      process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000"
+    );
 
     socketRef.current = socket;
 
     socket.on("connect", () => {
       console.log("Connected to Socket.io:", socket.id);
+
       setConnected(true);
-     
+
+      socket.emit("chat:join", "General");
     });
 
     socket.on("disconnect", () => {
@@ -59,6 +63,26 @@ const socket = io(
     socket.on("chat:typing", (data) => {
       setTypingUser(data.isTyping ? data.username : "");
     });
+  };
+
+  // Change Chat Room
+  const handleRoomChange = (e) => {
+    const selectedRoom = e.target.value;
+
+    setRoom(selectedRoom);
+    setMessages([]);
+    setTypingUser("");
+
+    clearTimeout(typingTimeoutRef.current);
+
+    if (socketRef.current?.connected) {
+      socketRef.current.emit("chat:typing", {
+        username,
+        isTyping: false,
+      });
+
+      socketRef.current.emit("chat:join", selectedRoom);
+    }
   };
 
   // Send Message
@@ -127,11 +151,7 @@ const socket = io(
             }}
           />
 
-          <button
-            type="submit"
-            disabled={!usernameInput.trim()}
-            style={{ padding: "12px 25px", cursor: "pointer" }}
-          >
+          <button type="submit" disabled={!usernameInput.trim()}>
             Join Chat
           </button>
         </form>
@@ -148,6 +168,33 @@ const socket = io(
             </strong>
           </p>
 
+          {/* Room Selection */}
+          <div style={{ marginTop: "20px" }}>
+            <label htmlFor="room">
+              <strong>Select Chat Room: </strong>
+            </label>
+
+            <select
+              id="room"
+              value={room}
+              onChange={handleRoomChange}
+              disabled={!connected}
+              style={{
+                padding: "10px",
+                borderRadius: "6px",
+                marginLeft: "10px",
+              }}
+            >
+              <option value="General">General</option>
+              <option value="Tech Support">Tech Support</option>
+            </select>
+          </div>
+
+          <h3 style={{ marginTop: "20px" }}>
+            Current Room: {room}
+          </h3>
+
+          {/* Messages */}
           <div
             style={{
               border: "1px solid #ccc",
@@ -159,7 +206,7 @@ const socket = io(
             }}
           >
             {messages.length === 0 ? (
-              <p>No messages yet. Start chatting!</p>
+              <p>No messages in this room yet. Start chatting!</p>
             ) : (
               messages.map((msg, index) => (
                 <p key={index}>
@@ -169,12 +216,14 @@ const socket = io(
             )}
           </div>
 
+          {/* Typing Indicator */}
           {typingUser && typingUser !== username && (
             <p style={{ color: "gray", fontStyle: "italic" }}>
               {typingUser} is typing...
             </p>
           )}
 
+          {/* Message Input */}
           <form
             onSubmit={sendMessage}
             style={{ display: "flex", gap: "10px", marginTop: "15px" }}
@@ -192,14 +241,7 @@ const socket = io(
               }}
             />
 
-            <button
-              type="submit"
-              disabled={!connected}
-              style={{
-                padding: "12px 25px",
-                cursor: connected ? "pointer" : "not-allowed",
-              }}
-            >
+            <button type="submit" disabled={!connected}>
               Send
             </button>
           </form>

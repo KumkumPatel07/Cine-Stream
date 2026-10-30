@@ -43,16 +43,45 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
   console.log("New client connected:", socket.id);
 
-  // Receive message and broadcast
-  socket.on("chat:message", (message) => {
-    console.log("Message received:", message);
+  // Join Chat Room
+  socket.on("chat:join", (room) => {
+    const allowedRooms = ["General", "Tech Support"];
 
-    io.emit("chat:message", message);
+    if (!allowedRooms.includes(room)) return;
+
+    // Leave previous room
+    if (socket.data.room) {
+      socket.leave(socket.data.room);
+    }
+
+    // Join selected room
+    socket.join(room);
+    socket.data.room = room;
+
+    console.log(`${socket.id} joined ${room}`);
   });
 
-  // Receive typing status and broadcast to other clients
+  // Receive and broadcast message to selected room
+  socket.on("chat:message", (message) => {
+    const room = socket.data.room;
+
+    if (!room) return;
+
+    console.log("Message received:", message);
+
+    io.to(room).emit("chat:message", {
+      ...message,
+      room,
+    });
+  });
+
+  // Typing indicator for selected room
   socket.on("chat:typing", (data) => {
-    socket.broadcast.emit("chat:typing", data);
+    const room = socket.data.room;
+
+    if (!room) return;
+
+    socket.to(room).emit("chat:typing", data);
   });
 
   // Client disconnected
