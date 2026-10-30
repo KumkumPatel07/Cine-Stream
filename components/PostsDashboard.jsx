@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 const API_URL = (
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+  process.env.NEXT_PUBLIC_API_URL || "https://cine-stream-mkfn.onrender.com"
 ).replace(/\/$/, "");
 
 const DEFAULT_AUTHOR_ID = "6acd0838e5f103816d8cd679";

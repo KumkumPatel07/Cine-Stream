@@ -4,18 +4,19 @@ import Link from "next/link";
 import SearchBar from "./SearchBar";
 
 export default function Navbar() {
-  return (
-    <nav className="navbar">
-      <Link href="/" className="logo">
-        Cine-Stream
-      </Link>
+return ( <nav className="navbar"> <Link href="/" className="logo">
+Cine-Stream </Link>
 
-      <SearchBar />
+```
+  <SearchBar />
 
-      <div className="nav-links">
-        <Link href="/">Home</Link>
-        <Link href="/favorites">Favorites</Link>
-      </div>
-    </nav>
-  );
+  <div className="nav-links">
+    <Link href="/">Home</Link>
+    <Link href="/favorites">Favorites</Link>
+    <Link href="/posts">Create Post</Link>
+  </div>
+</nav>
+
+
+);
 }
