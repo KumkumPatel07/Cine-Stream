@@ -39,7 +39,7 @@ app.get("/", (req, res) => {
   });
 });
 
-// Socket.io Connection
+/// Socket.io Connection
 io.on("connection", (socket) => {
   console.log("New client connected:", socket.id);
 
@@ -48,6 +48,11 @@ io.on("connection", (socket) => {
     console.log("Message received:", message);
 
     io.emit("chat:message", message);
+  });
+
+  // Receive typing status and broadcast to other clients
+  socket.on("chat:typing", (data) => {
+    socket.broadcast.emit("chat:typing", data);
   });
 
   // Client disconnected
