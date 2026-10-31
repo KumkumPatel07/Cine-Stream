@@ -15,10 +15,17 @@ const app = express();
 // Create HTTP Server
 const server = http.createServer(app);
 
+// Allowed Frontend URLs
+const allowedOrigins = (
+  process.env.CLIENT_URL || "http://localhost:3000"
+)
+  .split(",")
+  .map((url) => url.trim());
+
 // Initialize Socket.io
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
   },
 });
